@@ -1,0 +1,4 @@
+deb http://mirror.vpgrp.io/devuan jessie main
+deb http://mirror.vpgrp.io/devuan jessie-updates main
+deb http://mirror.vpgrp.io/devuan jessie-backports main
+deb http://mirror.vpgrp.io/devuan jessie-security main

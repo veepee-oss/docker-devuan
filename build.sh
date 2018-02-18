@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1039
+# shellcheck disable=SC2034
 
 set -e
 
-PATH='/usr/sbin:/usr/bin:/sbin:/bin'
+PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 arch='amd64'
 stable='jessie'
 testing='ascii'
-version='1.0'
+version='2.0'
 
 function usage()
 {
@@ -21,13 +23,24 @@ USAGE:
 
 OPTIONS:
    -h, --help           Show help
-   -d, --dist           Choose Devuan distribution (jessie, ascii)
-   -m, --mirror		Choose your preferred mirror (default: auto.mirror.devuan.org)
-   -t, --timezone       Choose your preferred timezone (default: Europe/Amsterdam)
-   -u, --user           Docker Hub username or organisation (default: $USER)
+
+   -d, --dist           Choose Devuan distribution
+                        eg: jessie, ascii
+
+   -t, --timezone       Choose your preferred timezone
+                        default: Europe/Amsterdam
+
+   -u, --user           Docker Hub username or organisation
+                        default: $USER
+
    -p, --push           Docker Hub push
-   -l, --latest         Force the "latest" (default: jessie)
+                        default: no
+
+   -l, --latest         Force the "latest"
+                        default: jessie
+
    -v, --verbose        Verbose mode
+
    -V, --version        Show version
 
 VERSION:
@@ -36,15 +49,26 @@ VERSION:
 EOF
 }
 
-function docker_debootstrap()
+function docker_bootstrap()
 {
     # variables
     image="/tmp/image-${distname}-${arch}"
-    include="${include} apt-transport-https,apt-utils,ca-certificates,curl,devuan-keyring,git,locales"
-    exclude='debconf-i18n,git-man,info,man-db,manpages'
+    include="${include},\
+             apt-transport-https,\
+             apt-utils,\
+             ca-certificates,\
+             curl,\
+             devuan-keyring,\
+             git,\
+             locales"
+    exclude="debconf-i18n,\
+             git-man,\
+             info,\
+             man-db,\
+             manpages"
     components='main'
 
-    echo "-- debootstrap ${distname}" 1>&3
+    echo '-- bootstrap' 1>&3
 
     if [ "$(id -u)" -ne 0 ]
     then
@@ -58,13 +82,15 @@ function docker_debootstrap()
     fi
 
     # create minimal debootstrap image
-    if [ ! -f "/usr/share/debootstrap/scripts/${distname}" ] || [ ! -h "/usr/share/debootstrap/scripts/${distname}" ]
+    if [ ! -f "/usr/share/debootstrap/scripts/${distname}" ] || \
+       [ ! -h "/usr/share/debootstrap/scripts/${distname}" ]
     then
-	echo "/!\ File /usr/share/debootstrap/scripts/${distname} is missing." 1>&3
+        echo "File /usr/share/debootstrap/scripts/${distname} is missing." 1>&3
         echo "1.) did you install backports version of debootstrap ?" 1>&3
-        echo "2.) run sudo ln -s sid /usr/share/debootstrap/scripts/${distname}" 1>&3
+        echo "2.) ln -s sid /usr/share/debootstrap/scripts/${distname}" 1>&3
         exit 1
     else
+        echo " * debootstrap ${image}" 1>&3
         ${sudo} debootstrap \
                 --arch="${arch}" \
                 --include="${include}" \
@@ -73,17 +99,19 @@ function docker_debootstrap()
                 --no-check-gpg \
                 "${distname}" \
                 "${image}" \
-                "http://${mirror}/merged"
+                "${mirror}"
         if [ ${?} -ne 0 ]
         then
-            echo "/!\ There is an issue with debootstrap, please run again with -v (verbose)." 1>&3
+            echo "There is an issue with debootstrap." 1>&3
+            echo "Please run again with -v." 1>&3
             exit 1
         fi
     fi
 
     # create /etc/default/locale
     echo ' * /etc/default/locale' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/default/locale"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/default/locale"
 LANG=en_US.UTF-8
 LANGUAGE=en_US.UTF-8
 LC_COLLATE=en_US.UTF-8
@@ -92,40 +120,27 @@ EOF
 
     # create /etc/timezone
     echo ' * /etc/timezone' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/timezone"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/timezone"
 ${timezone}
 EOF
 
     # create /etc/resolv.conf
     echo ' * /etc/resolv.conf' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/resolv.conf"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/resolv.conf"
 nameserver 8.8.4.4
 nameserver 8.8.8.8
 EOF
 
     # create /etc/apt/sources.list
     echo ' * /etc/apt/sources.list' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/sources.list"
-deb http://${mirror}/merged ${distname} ${components}
-deb http://${mirror}/merged ${distname}-updates ${components}
-EOF
-
-    # create /etc/apt/sources.list.d/backports.list
-    echo ' * /etc/apt/sources.list.d/backports.list' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/sources.list.d/backports.list"
-deb http://${mirror}/merged ${distname}-backports ${components}
-EOF
-
-    # create /etc/apt/sources.list.d/security.list
-    echo ' * /etc/apt/sources.list.d/security.list' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/sources.list.d/security.list"
-deb http://${mirror}/merged ${distname}-security ${components}
-EOF
+    ${sudo} cp -r "sources.list/${distname}" "${image}/etc/apt/sources.list"
 
     # create /etc/dpkg/dpkg.cfg.d/disable-doc
-    # thanks to http://askubuntu.com/questions/129566/remove-documentation-to-save-hard-drive-space
     echo ' * /etc/dpkg/dpkg.cfg.d/disable-doc'  1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/dpkg/dpkg.cfg.d/disable-doc"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/dpkg/dpkg.cfg.d/disable-doc"
 path-exclude /usr/share/doc/*
 path-include /usr/share/doc/*/copyright
 path-exclude /usr/share/info/*
@@ -133,32 +148,32 @@ path-exclude /usr/share/man/*
 EOF
 
     # create /etc/apt/apt.conf.d/force-ipv4
-    # thanks to https://github.com/cw-ansible/cw.apt/
     echo ' * /etc/apt/apt.conf.d/force-ipv4' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/apt.conf.d/force-ipv4"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/apt/apt.conf.d/force-ipv4"
 Acquire::ForceIPv4 "true";
 EOF
 
     # create /etc/apt/apt.conf.d/disable-auto-install
-    # thanks to https://github.com/cw-ansible/cw.apt/
     echo ' * /etc/apt/apt.conf.d/disable-auto-install' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-auto-install"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-auto-install"
 APT::Install-Recommends "0";
 APT::Install-Suggests "0";
 EOF
 
     # create /etc/apt/apt.conf.d/disable-cache
-    # thanks to https://github.com/docker/docker/blob/master/contrib/mkimage-debootstrap.sh
     echo ' * /etc/apt/apt.conf.d/disable-cache' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-cache"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-cache"
 Dir::Cache::pkgcache "";
 Dir::Cache::srcpkgcache "";
 EOF
 
     # create /etc/apt/apt.conf.d/force-conf
-    # thanks to https://raphaelhertzog.com/2010/09/21/debian-conffile-configuration-file-managed-by-dpkg/
     echo ' * /etc/apt/apt.conf.d/force-conf' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/apt.conf.d/force-conf"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/apt/apt.conf.d/force-conf"
 Dpkg::Options {
    "--force-confnew";
    "--force-confmiss";
@@ -166,15 +181,16 @@ Dpkg::Options {
 EOF
 
     # create /etc/apt/apt.conf.d/disable-languages
-    # thanks to https://github.com/docker/docker/blob/master/contrib/mkimage-debootstrap.sh
     echo ' * /etc/apt/apt.conf.d/disable-languages' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-languages"
+    cat <<EOF | \
+        ${sudo} tee "${image}/etc/apt/apt.conf.d/disable-languages"
 Acquire::Languages "none";
 EOF
 
     # create /usr/bin/apt-clean
     echo ' * /usr/bin/apt-clean' 1>&3
-    cat <<EOF | ${sudo} tee "${image}/usr/bin/apt-clean"
+    cat <<EOF | \
+        ${sudo} tee "${image}/usr/bin/apt-clean"
 #!/bin/bash
 
 # Please read https://wiki.debian.org/ReduceDebian
@@ -185,9 +201,10 @@ find /usr/share/locale  -type f -delete
 find /usr/share/man     -type f -delete
 find /var/cache/apt     -type f -delete
 find /var/lib/apt/lists -type f -delete
-apt-get autoclean -qq -y
-apt-get autoremove -qq -y
-apt-get clean -qq -y
+
+apt-get autoclean       -qq -y
+apt-get autoremove      -qq -y
+apt-get clean           -qq -y
 # EOF
 EOF
     ${sudo} chmod 755 "${image}/usr/bin/apt-clean"
@@ -206,14 +223,11 @@ EOF
     echo ' * apt-get upgrade' 1>&3
     ${sudo} chroot "${image}" bash -c \
             "export DEBIAN_FRONTEND=noninteractive && \
-             export LC_ALL=en_US.UTF-8 && \
              update-ca-certificates -f && \
-             apt-get update -qq && \
-             apt-get upgrade -qq -y && \
-             apt-get dist-upgrade -qq -y && \
-             apt-get autoclean -qq -y && \
-             apt-get autoremove -qq -y && \
-             apt-get clean -qq -y"
+             apt-get update && \
+             apt-get upgrade -y && \
+             apt-get dist-upgrade -y && \
+             apt-clean"
 
     # unmount
     ${sudo} umount "${image}/dev/pts"
@@ -221,37 +235,32 @@ EOF
     ${sudo} umount "${image}/proc"
     ${sudo} umount "${image}/sys"
 
-    # clean
-    ${sudo} find   "${image}/usr/share/doc"     -type f ! -name copyright -delete
-    ${sudo} find   "${image}/usr/share/i18n"    -type f -delete
-    ${sudo} find   "${image}/usr/share/locale"  -type f -delete
-    ${sudo} find   "${image}/usr/share/man"     -type f -delete
-    ${sudo} find   "${image}/var/cache/apt"     -type f -delete
-    ${sudo} find   "${image}/var/lib/apt/lists" -type f -delete
-
     # create archive
     if [ -f "${image}.tar" ]
     then
         ${sudo} rm "${image}.tar"
     fi
-    ${sudo} tar --numeric-owner -cf "${image}.tar" -C "${image}" .
+    ${sudo} tar -C "${image}" -c -f "${image}.tar" --numeric-owner .
 }
 
 # create images from bootstrap archive
 function docker_import()
 {
-    echo "-- docker import devuan:${distname} (from ${image}.tgz)" 1>&3
+    echo "-- docker import from ${image}" 1>&3
     docker import "${image}.tar" "${user}/devuan:${distname}"
-    docker run "${user}/devuan:${distname}" echo "Successfully build ${user}/devuan:${distname}" 1>&3
+    docker run "${user}/devuan:${distname}" \
+           echo " * build ${user}/devuan:${distname}" 1>&3
     docker tag "${user}/devuan:${distname}" "${user}/devuan:${distid}"
-    docker run "${user}/devuan:${distid}" echo "Successfully build ${user}/devuan:${distid}" 1>&3
+    docker run "${user}/devuan:${distid}" \
+           echo " * build ${user}/devuan:${distid}" 1>&3
 
     for import in latest oldstable stable testing
     do
         if [ "${distname}" = "${!import}" ]
         then
             docker tag "${user}/devuan:${distname}" "${user}/devuan:${import}"
-	    docker run "${user}/devuan:${import}" echo "Successfully build ${user}/devuan:${import}" 1>&3
+            docker run "${user}/devuan:${import}" \
+                   echo " * build ${user}/devuan:${import}" 1>&3
         fi
     done
 }
@@ -259,22 +268,23 @@ function docker_import()
 # push image to docker hub
 function docker_push()
 {
-    echo "-- docker push devuan:${distname}" 1>&3
+    echo "-- docker push" 1>&3
+    echo " * push ${user}/devuan:${distname}" 1>&3
     docker push "${user}/devuan:${distname}"
-    echo "-- docker push devuan:${distid}"
-    docker push "${user}/devuan:${distid}" 1>&3
+    echo " * push ${user}/devuan:${distid}" 1>&3
+    docker push "${user}/devuan:${distid}"
 
     for push in latest oldstable stable testing
     do
         if [ "${distname}" = "${!push}"  ]
         then
-            echo "-- docker push ${push}" 1>&3
+            echo " * push ${user}/devuan:${push}" 1>&3
             docker push "${user}/devuan:${push}"
         fi
     done
 }
 
-while getopts 'hd:m:t:u:plvV' OPTIONS
+while getopts 'hd:t:u:plvV' OPTIONS
 do
     case ${OPTIONS} in
         h)
@@ -285,10 +295,6 @@ do
         d)
             # -d / --dist
             dist=${OPTARG}
-            ;;
-        m)
-            # -m / --mirror
-            mirror=${OPTARG}
             ;;
         t)
             # -t / --timezone
@@ -341,10 +347,12 @@ then
         jessie|1|1.0)
             distname='jessie'
             distid='1'
+            mirror='http://mirror.vpgrp.io/devuan'
             ;;
         ascii|2|2.0)
             distname='stretch'
             distid='2'
+            mirror='http://mirror.vpgrp.io/devuan'
             include='gnupg2'
             ;;
         *)
@@ -355,12 +363,6 @@ then
 else
     usage
     exit 1
-fi
-
-# -m / --mirror
-if [ -z "${mirror}" ]
-then
-    mirror='auto.mirror.devuan.org'
 fi
 
 # -t / --timezone
@@ -391,7 +393,7 @@ else
     exec 3>&1
 fi
 
-docker_debootstrap
+docker_bootstrap
 docker_import
 
 if [ -n "${push}" ]

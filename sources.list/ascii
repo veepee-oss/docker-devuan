@@ -1,0 +1,4 @@
+deb http://mirror.vpgrp.io/devuan ascii main
+deb http://mirror.vpgrp.io/devuan ascii-updates main
+deb http://mirror.vpgrp.io/devuan ascii-backports main
+deb http://mirror.vpgrp.io/devuan ascii-security main
