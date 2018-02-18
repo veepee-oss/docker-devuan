@@ -347,12 +347,12 @@ then
         jessie|1|1.0)
             distname='jessie'
             distid='1'
-            mirror='http://mirror.vpgrp.io/merged'
+            mirror='http://mirror.vpgrp.io/devuan'
             ;;
         ascii|2|2.0)
             distname='stretch'
             distid='2'
-            mirror='http://mirror.vpgrp.io/merged'
+            mirror='http://mirror.vpgrp.io/devuan'
             include='gnupg2'
             ;;
         *)
