@@ -99,7 +99,7 @@ function docker_bootstrap()
                 --no-check-gpg \
                 "${distname}" \
                 "${image}" \
-                "${mirror}/merged"
+                "${mirror}"
         if [ ${?} -ne 0 ]
         then
             echo "There is an issue with debootstrap." 1>&3
@@ -347,12 +347,12 @@ then
         jessie|1|1.0)
             distname='jessie'
             distid='1'
-            mirror='http://mirror.vpgrp.io/devuan'
+            mirror='http://mirror.vpgrp.io/merged'
             ;;
         ascii|2|2.0)
             distname='stretch'
             distid='2'
-            mirror='http://mirror.vpgrp.io/devuan'
+            mirror='http://mirror.vpgrp.io/merged'
             include='gnupg2'
             ;;
         *)
