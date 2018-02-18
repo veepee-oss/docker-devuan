@@ -99,7 +99,7 @@ function docker_bootstrap()
                 --no-check-gpg \
                 "${distname}" \
                 "${image}" \
-                "${mirror}"
+                "${mirror}/merged"
         if [ ${?} -ne 0 ]
         then
             echo "There is an issue with debootstrap." 1>&3
