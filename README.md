@@ -1,7 +1,17 @@
 # docker-devuan
+
 [![License][license-img]][license-href]
 [![pipeline][pipeline-img]][pipeline-href]
 [![docker][docker-img]][docker-href]
+
+1. [Overview](#overview)
+2. [Description](#description)
+3. [Tags](#tags)
+4. [Setup](#setup)
+5. [Usage](#usage)
+6. [Limitations](#limitations)
+7. [Development](#development)
+8. [Miscellaneous](#miscellaneous)
 
 ## Overview
 
@@ -9,7 +19,7 @@ Devuan is  a free software  operating system  for your computer.  Free software
 means you are free to use, copy and distribute, study, change the software, and
 share your modifications with the community.
 
-[devuan.org](https://www.devuan.org/)
+[devuan.org][overview-href]
 
 ## Description
 
@@ -22,37 +32,37 @@ Supported tags.
 - 1, jessie, stable, latest
 - 2, ascii, sid
 
-## Requirements
+## Setup
 
 On Debian you need sudo permissions and the following packages:
 
 ```bash
 # if you build on wheezy please use backports version of debootstrap
-$ sudo apt-get -qq -y install debootstrap
+sudo apt-get -qq -y install debootstrap
 ```
 
 On Devuan you need sudo permissions and the following packages:
 
 ```bash
-$ sudo apt-get -qq -y install debootstrap
+sudo apt-get -qq -y install debootstrap
 ```
 
 On Ubuntu you need sudo permissions and the following packages:
 
 ```bash
-$ sudo apt-get -qq -y install debian-keyring debian-archive-keyring debootstrap
+sudo apt-get -qq -y install debian-keyring debian-archive-keyring debootstrap
 ```
 
 You also need to be in the docker group to use Docker.
 
 ```bash
-$ sudo usermod -a -G docker ${USER}
+sudo usermod -a -G docker ${USER}
 ```
 
 Finally you need to login on Docker Hub.
 
 ```bash
-$ docker login
+docker login
 ```
 
 ## Usage
@@ -64,19 +74,19 @@ organization) name on Docker Hub.
 Show help.
 
 ```bash
-$ ./build.sh -h
+./build.sh -h
 ```
 
 Build your own Debian image (eg. jessie).
 
 ```bash
-$ ./build.sh -d jessie -u vpgrp
+./build.sh -d jessie -u vpgrp
 ```
 
 Build your own Devuan image (eg. jessie) and push it on the Docker Hub.
 
 ```bash
-$ ./build.sh -d jessie -u vpgrp -p
+./build.sh -d jessie -u vpgrp -p
 ```
 
 ## Limitations
@@ -101,9 +111,10 @@ request.
 ```
 
 [license-img]: https://img.shields.io/badge/license-Apache-blue.svg
-[license-href]: /LICENSE
+[license-href]: LICENSE
 [pipeline-img]: https://git.vpgrp.io/docker/docker-devuan/badges/master/pipeline.svg
 [pipeline-href]: https://git.vpgrp.io/docker/docker-devuan/commits/master
 [docker-img]: https://img.shields.io/docker/pulls/vpgrp/devuan.svg
 [docker-href]: https://registry.hub.docker.com/u/vpgrp/devuan
-[contribute-href]: /CONTRIBUTING.md
+[overview-href]: https://www.devuan.org/
+[contribute-href]: CONTRIBUTING.md
