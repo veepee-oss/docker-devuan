@@ -38,7 +38,7 @@ OPTIONS:
                         default: no
 
    -l, --latest         Force the "latest"
-                        default: jessie
+                        default: ascii
 
    -v, --verbose        Verbose mode
 
@@ -381,7 +381,7 @@ fi
 # -l / --latest
 if [ -z "${latest}" ]
 then
-    latest='jessie'
+    latest='ascii'
 fi
 
 # -v / --verbose
