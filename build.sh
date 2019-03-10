@@ -247,20 +247,20 @@ EOF
 function docker_import()
 {
     echo "-- docker import from ${image}" 1>&3
-    docker import "${image}.tar" "${user}/devuan:${distname}"
-    docker run "${user}/devuan:${distname}" \
-           echo " * build ${user}/devuan:${distname}" 1>&3
-    docker tag "${user}/devuan:${distname}" "${user}/devuan:${distid}"
-    docker run "${user}/devuan:${distid}" \
-           echo " * build ${user}/devuan:${distid}" 1>&3
+    docker import "${image}.tar" "${user}devuan:${distname}"
+    docker run "${user}devuan:${distname}" \
+           echo " * build ${user}devuan:${distname}" 1>&3
+    docker tag "${user}devuan:${distname}" "${user}devuan:${distid}"
+    docker run "${user}devuan:${distid}" \
+           echo " * build ${user}devuan:${distid}" 1>&3
 
     for import in latest oldstable stable testing
     do
         if [ "${distname}" = "${!import}" ]
         then
-            docker tag "${user}/devuan:${distname}" "${user}/devuan:${import}"
-            docker run "${user}/devuan:${import}" \
-                   echo " * build ${user}/devuan:${import}" 1>&3
+            docker tag "${user}devuan:${distname}" "${user}devuan:${import}"
+            docker run "${user}devuan:${import}" \
+                   echo " * build ${user}devuan:${import}" 1>&3
         fi
     done
 }
@@ -269,17 +269,17 @@ function docker_import()
 function docker_push()
 {
     echo "-- docker push" 1>&3
-    echo " * push ${user}/devuan:${distname}" 1>&3
-    docker push "${user}/devuan:${distname}"
-    echo " * push ${user}/devuan:${distid}" 1>&3
-    docker push "${user}/devuan:${distid}"
+    echo " * push ${user}devuan:${distname}" 1>&3
+    docker push "${user}devuan:${distname}"
+    echo " * push ${user}devuan:${distid}" 1>&3
+    docker push "${user}devuan:${distid}"
 
     for push in latest oldstable stable testing
     do
         if [ "${distname}" = "${!push}"  ]
         then
-            echo " * push ${user}/devuan:${push}" 1>&3
-            docker push "${user}/devuan:${push}"
+            echo " * push ${user}devuan:${push}" 1>&3
+            docker push "${user}devuan:${push}"
         fi
     done
 }
@@ -302,7 +302,7 @@ do
             ;;
         u)
             # -u / --user
-            user=${OPTARG}
+            user="${OPTARG}/"
             ;;
         p)
             # -p / --push
