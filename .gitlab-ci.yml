@@ -1,44 +1,96 @@
 ---
 # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
 
+.template: &build
+  stage: build
+  image: vpgrp/kitchen:latest
+  before_script:
+    - apt-get update
+    - apt-get install -t stretch-backports -y debootstrap
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - image
+  variables:
+    DOCKER_DRIVER: overlay
+
+.template: &deploy
+  stage: deploy
+  image: docker:latest
+  before_script:
+    - docker login -u "$REGISTRY_USERNAME" -p "$REGISTRY_PASSWORD"
+    - docker load -i image/v1.0.tar
+    - docker load -i image/v2.0.tar
+  only:
+    - master
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+
 stages:
-  - commit
-  - syntax
-  - docker
+  - test
+  - build
+  - deploy
 
-# commit
-git-history:
-  stage: commit
-  script:
-    - >
-      bash <(curl -s
-      https://gitlab.com/yue-script/checks/raw/master/check_git_history.sh)
-
-# syntax
+# test
 shellcheck:
-  stage: syntax
+  stage: test
   image: vpgrp/linter:shell
   script:
     - shellcheck build.sh
 
 # build
-# build-jessie:
-#   stage: docker
-#   image: vpgrp/debian:jessie
-#   before_script:
-#     - apt-get update  -qq -y
-#     - apt-get install -qq -y debootstrap sudo
-#     - apt-get install -qq -y debian-keyring debian-archive-keyring
-#   script:
-#     - ./build.sh -d jessie -u vpgrp
+v1.0:
+  <<: *build
+  script:
+    - ./build.sh -d jessie -v
+    - mkdir image
+    - docker save debian:jessie > image/v1.0.tar
 
-# build-stretch:
-#   stage: docker
-#   image: vpgrp/debian:stretch
-#   before_script:
-#     - apt-get update  -qq -y
-#     - apt-get install -qq -y debootstrap sudo
-#     - apt-get install -qq -y debian-keyring debian-archive-keyring
-#   script:
-#     - ./build.sh -d stretch -u vpgrp
+v2.0:
+  <<: *build
+  script:
+    - ./build.sh -d ascii -v
+    - mkdir image
+    - docker save debian:acsii > image/v2.0.tar
+
+# deploy
+# https://hub.docker.com/u/vpgrp/
+vpgrp:
+  <<: *deploy
+  script:
+    - docker tag devuan:jessie  vpgrp/devuan:jessie
+    - docker tag devuan:jessie  vpgrp/devuan:1
+    - docker tag devuan:jessie  vpgrp/devuan:oldstable
+    - docker tag devuan:stretch vpgrp/devuan:stretch
+    - docker tag devuan:stretch vpgrp/devuan:2
+    - docker tag devuan:stretch vpgrp/devuan:stable
+    - docker tag devuan:stretch vpgrp/devuan:latest
+    - docker push vpgrp/devuan:jessie
+    - docker push vpgrp/devuan:1
+    - docker push vpgrp/devuan:oldstable
+    - docker push vpgrp/devuan:stretch
+    - docker push vpgrp/devuan:2
+    - docker push vpgrp/devuan:stable
+    - docker push vpgrp/devuan:latest
+
+# https://hub.docker.com/u/vptech/
+vptech:
+  <<: *deploy
+  script:
+    - docker tag devuan:jessie  vptech/devuan:jessie
+    - docker tag devuan:jessie  vptech/devuan:1
+    - docker tag devuan:jessie  vptech/devuan:oldstable
+    - docker tag devuan:stretch vptech/devuan:stretch
+    - docker tag devuan:stretch vptech/devuan:2
+    - docker tag devuan:stretch vptech/devuan:stable
+    - docker tag devuan:stretch vptech/devuan:latest
+    - docker push vptech/devuan:jessie
+    - docker push vptech/devuan:1
+    - docker push vptech/devuan:oldstable
+    - docker push vptech/devuan:stretch
+    - docker push vptech/devuan:2
+    - docker push vptech/devuan:stable
+    - docker push vptech/devuan:latest
 # EOF
