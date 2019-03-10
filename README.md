@@ -79,13 +79,13 @@ Show help.
 Build your own Debian image (eg. jessie).
 
 ```bash
-./build.sh -d jessie -u vpgrp
+./build.sh -d jessie -u vptech
 ```
 
-Build your own Devuan image (eg. jessie) and push it on the Docker Hub.
+Build your own Devuan image (eg. ascii) and push it on the Docker Hub.
 
 ```bash
-./build.sh -d jessie -u vpgrp -p
+./build.sh -d ascii -u vptech -p
 ```
 
 ## Limitations
