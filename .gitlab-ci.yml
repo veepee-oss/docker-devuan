@@ -54,7 +54,7 @@ v2.0:
   script:
     - ./build.sh -d ascii -v
     - mkdir image
-    - docker save debian:acsii > image/v2.0.tar
+    - docker save debian:ascii > image/v2.0.tar
 
 # deploy
 # https://hub.docker.com/u/vpgrp/
