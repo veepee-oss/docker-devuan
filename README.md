@@ -28,8 +28,8 @@ Use this script to build your own base system.
 
 Supported tags.
 
-- 1, 1.0, jessie, oldstable
-- 2, 2.0, ascii, stable, latest
+- 1, jessie, oldstable
+- 2, ascii, stable, latest
 
 ## Setup
 
