@@ -61,17 +61,17 @@ v2.0:
 vpgrp:
   <<: *deploy
   script:
-    - docker tag devuan:jessie  vpgrp/devuan:jessie
-    - docker tag devuan:jessie  vpgrp/devuan:1
-    - docker tag devuan:jessie  vpgrp/devuan:oldstable
-    - docker tag devuan:stretch vpgrp/devuan:stretch
-    - docker tag devuan:stretch vpgrp/devuan:2
-    - docker tag devuan:stretch vpgrp/devuan:stable
-    - docker tag devuan:stretch vpgrp/devuan:latest
+    - docker tag devuan:jessie vpgrp/devuan:jessie
+    - docker tag devuan:jessie vpgrp/devuan:1
+    - docker tag devuan:jessie vpgrp/devuan:oldstable
+    - docker tag devuan:ascii  vpgrp/devuan:ascii
+    - docker tag devuan:ascii  vpgrp/devuan:2
+    - docker tag devuan:ascii  vpgrp/devuan:stable
+    - docker tag devuan:ascii  vpgrp/devuan:latest
     - docker push vpgrp/devuan:jessie
     - docker push vpgrp/devuan:1
     - docker push vpgrp/devuan:oldstable
-    - docker push vpgrp/devuan:stretch
+    - docker push vpgrp/devuan:ascii
     - docker push vpgrp/devuan:2
     - docker push vpgrp/devuan:stable
     - docker push vpgrp/devuan:latest
@@ -80,17 +80,17 @@ vpgrp:
 vptech:
   <<: *deploy
   script:
-    - docker tag devuan:jessie  vptech/devuan:jessie
-    - docker tag devuan:jessie  vptech/devuan:1
-    - docker tag devuan:jessie  vptech/devuan:oldstable
-    - docker tag devuan:stretch vptech/devuan:stretch
-    - docker tag devuan:stretch vptech/devuan:2
-    - docker tag devuan:stretch vptech/devuan:stable
-    - docker tag devuan:stretch vptech/devuan:latest
+    - docker tag devuan:jessie vptech/devuan:jessie
+    - docker tag devuan:jessie vptech/devuan:1
+    - docker tag devuan:jessie vptech/devuan:oldstable
+    - docker tag devuan:ascii  vptech/devuan:ascii
+    - docker tag devuan:ascii  vptech/devuan:2
+    - docker tag devuan:ascii  vptech/devuan:stable
+    - docker tag devuan:ascii  vptech/devuan:latest
     - docker push vptech/devuan:jessie
     - docker push vptech/devuan:1
     - docker push vptech/devuan:oldstable
-    - docker push vptech/devuan:stretch
+    - docker push vptech/devuan:ascii
     - docker push vptech/devuan:2
     - docker push vptech/devuan:stable
     - docker push vptech/devuan:latest
