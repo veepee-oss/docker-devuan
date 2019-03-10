@@ -350,7 +350,7 @@ then
             mirror='http://mirror.vpgrp.io/devuan/merged'
             ;;
         ascii|2|2.0)
-            distname='stretch'
+            distname='ascii'
             distid='2'
             mirror='http://mirror.vpgrp.io/devuan/merged'
             include='gnupg2'
