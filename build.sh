@@ -7,9 +7,10 @@ set -e
 PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 arch='amd64'
-stable='jessie'
-testing='ascii'
-version='2.0'
+oldstable='jessie'
+stable='ascii'
+testing='beowulf'
+version='2.1'
 
 function usage()
 {
