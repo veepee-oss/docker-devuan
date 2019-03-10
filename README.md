@@ -1,7 +1,6 @@
 # docker-devuan
 
 [![License][license-img]][license-href]
-[![pipeline][pipeline-img]][pipeline-href]
 [![docker][docker-img]][docker-href]
 
 1. [Overview](#overview)
@@ -29,8 +28,8 @@ Use this script to build your own base system.
 
 Supported tags.
 
-- 1, jessie, stable, latest
-- 2, ascii, sid
+- 1, 1.0, jessie, oldstable
+- 2, 2.0, ascii, stable, latest
 
 ## Setup
 
@@ -110,11 +109,9 @@ request.
    ╚═(███)═╝
 ```
 
-[license-img]: https://img.shields.io/badge/license-Apache-blue.svg
+[license-img]: https://img.shields.io/badge/license-ISC-blue.svg
 [license-href]: LICENSE
-[pipeline-img]: https://git.vpgrp.io/docker/docker-devuan/badges/master/pipeline.svg
-[pipeline-href]: https://git.vpgrp.io/docker/docker-devuan/commits/master
-[docker-img]: https://img.shields.io/docker/pulls/vpgrp/devuan.svg
-[docker-href]: https://registry.hub.docker.com/u/vpgrp/devuan
+[docker-img]: https://img.shields.io/docker/pulls/vptech/devuan.svg
+[docker-href]: https://hub.docker.com/r/vptech/devuan
 [overview-href]: https://www.devuan.org/
 [contribute-href]: CONTRIBUTING.md
