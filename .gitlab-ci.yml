@@ -7,6 +7,7 @@
   before_script:
     - apt-get update
     - apt-get install -t stretch-backports -y debootstrap
+    - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/ascii
   artifacts:
     expire_in: 1 day
     paths:
