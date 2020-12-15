@@ -1,17 +1,32 @@
 ---
-# https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+
+include:
+  - project: veepee/vptech/sre/iac/ci-cd/markdown-lint
+    ref: 1.2.2
+    file: gitlab-ci.yml
+  - project: veepee/vptech/sre/iac/ci-cd/semantic-release
+    ref: 3.2.1
+    file: gitlab-ci.yml
 
 .template: &build
   stage: build
-  image: docker.registry.vptech.eu/vpgrp/kitchen:latest
+  image: docker.registry.vptech.eu/vptech/debian:buster
   before_script:
-    - apt-get update
-    - apt-get install -t stretch-backports -y debootstrap
+    - apt-get update  -qq -y
+    - apt-get install -qq -y apt-transport-https ca-certificates curl debootstrap kmod gnupg-agent procps software-properties-common sudo systemd tar
     - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/ascii
+    - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/beowulf
+    - curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+    - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+    - apt-get update  -qq -y
+    - apt-get install -qq -y docker-ce docker-ce-cli containerd.io
+    - env DOCKER_DRIVER=vfs dockerd &
   artifacts:
     expire_in: 1 day
     paths:
       - image
+  tags:
+    - dind
   variables:
     DOCKER_DRIVER: overlay
 
@@ -19,27 +34,25 @@
   stage: deploy
   image: docker.registry.vptech.eu/docker:latest
   before_script:
-    - docker login -u "$REGISTRY_USERNAME" -p "$REGISTRY_PASSWORD"
+    - docker login -u "$DOCKER_PUBLIC_REGISTRY_USERNAME" -p "$DOCKER_PUBLIC_REGISTRY_PASSWORD"
     - docker load -i image/devuan-v1.0.tar
     - docker load -i image/devuan-v2.0.tar
+    - docker load -i image/devuan-v3.0.tar
   only:
     - master
   services:
-    - docker:dind
+    - name: docker.registry.vptech.eu/docker:dind
+      alias: docker
+  tags:
+    - dind
   variables:
     DOCKER_DRIVER: overlay
 
 stages:
-  - test
+  - lint
   - build
   - deploy
-
-# test
-shellcheck:
-  stage: test
-  image: docker.registry.vptech.eu/vpgrp/linter:shell
-  script:
-    - shellcheck build.sh
+  - release
 
 # build
 v1.0:
@@ -56,42 +69,25 @@ v2.0:
     - mkdir image
     - docker save devuan:ascii > image/devuan-v2.0.tar
 
-# deploy
-# https://hub.docker.com/u/vpgrp/
-vpgrp:
-  <<: *deploy
+v3.0:
+  <<: *build
   script:
-    - docker tag devuan:jessie vpgrp/devuan:jessie
-    - docker tag devuan:jessie vpgrp/devuan:1
-    - docker tag devuan:jessie vpgrp/devuan:oldstable
-    - docker tag devuan:ascii  vpgrp/devuan:ascii
-    - docker tag devuan:ascii  vpgrp/devuan:2
-    - docker tag devuan:ascii  vpgrp/devuan:stable
-    - docker tag devuan:ascii  vpgrp/devuan:latest
-    - docker push vpgrp/devuan:jessie
-    - docker push vpgrp/devuan:1
-    - docker push vpgrp/devuan:oldstable
-    - docker push vpgrp/devuan:ascii
-    - docker push vpgrp/devuan:2
-    - docker push vpgrp/devuan:stable
-    - docker push vpgrp/devuan:latest
+    - ./build.sh -d beowulf -v
+    - mkdir image
+    - docker save devuan:beowulf > image/devuan-v3.0.tar
 
-# https://hub.docker.com/u/vptech/
+# deploy
 vptech:
   <<: *deploy
   script:
-    - docker tag devuan:jessie vptech/devuan:jessie
-    - docker tag devuan:jessie vptech/devuan:1
-    - docker tag devuan:jessie vptech/devuan:oldstable
-    - docker tag devuan:ascii  vptech/devuan:ascii
-    - docker tag devuan:ascii  vptech/devuan:2
-    - docker tag devuan:ascii  vptech/devuan:stable
-    - docker tag devuan:ascii  vptech/devuan:latest
-    - docker push vptech/devuan:jessie
-    - docker push vptech/devuan:1
-    - docker push vptech/devuan:oldstable
-    - docker push vptech/devuan:ascii
-    - docker push vptech/devuan:2
-    - docker push vptech/devuan:stable
-    - docker push vptech/devuan:latest
+    - docker tag devuan:jessie  vptech/devuan:jessie
+    - docker tag devuan:jessie  vptech/devuan:1
+    - docker tag devuan:ascii   vptech/devuan:ascii
+    - docker tag devuan:ascii   vptech/devuan:2
+    - docker tag devuan:ascii   vptech/devuan:oldstable
+    - docker tag devuan:beowulf vptech/devuan:beowulf
+    - docker tag devuan:beowulf vptech/devuan:3
+    - docker tag devuan:beowulf vptech/devuan:stable
+    - docker tag devuan:beowulf vptech/devuan:latest
+    - docker push --all-tags vptech/devuan
 # EOF
