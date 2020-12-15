@@ -7,10 +7,10 @@ set -e
 PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 arch='amd64'
-oldstable='jessie'
-stable='ascii'
-testing='beowulf'
-version='2.1'
+oldstable='ascii'
+stable='beowulf'
+testing='chimaera'
+version='2.2'
 
 function usage()
 {
@@ -26,7 +26,7 @@ OPTIONS:
    -h, --help           Show help
 
    -d, --dist           Choose Devuan distribution
-                        eg: jessie, ascii
+                        eg: jessie, ascii, beowulf
 
    -t, --timezone       Choose your preferred timezone
                         default: Europe/Amsterdam
@@ -38,7 +38,7 @@ OPTIONS:
                         default: no
 
    -l, --latest         Force the "latest"
-                        default: ascii
+                        default: beowulf
 
    -v, --verbose        Verbose mode
 
@@ -233,7 +233,7 @@ EOF
     # unmount
     ${sudo} umount "${image}/dev/pts"
     ${sudo} umount "${image}/dev"
-    ${sudo} umount "${image}/proc"
+    # ${sudo} umount "${image}/proc"
     ${sudo} umount "${image}/sys"
 
     # create archive
@@ -248,6 +248,7 @@ EOF
 function docker_import()
 {
     echo "-- docker import from ${image}" 1>&3
+    mount -t proc proc /proc
     docker import "${image}.tar" "${user}devuan:${distname}"
     docker run "${user}devuan:${distname}" \
            echo " * build ${user}devuan:${distname}" 1>&3
@@ -348,12 +349,24 @@ then
         jessie|1|1.0)
             distname='jessie'
             distid='1'
-            mirror='http://mirror.vpgrp.io/devuan/merged'
+            mirror='http://mirror.vptech.eu/devuan/merged'
             ;;
         ascii|2|2.0)
             distname='ascii'
             distid='2'
-            mirror='http://mirror.vpgrp.io/devuan/merged'
+            mirror='http://mirror.vptech.eu/devuan/merged'
+            include='gnupg2'
+            ;;
+        beowulf|3|3.0)
+            distname='beowulf'
+            distid='3'
+            mirror='http://mirror.vptech.eu/devuan/merged'
+            include='gnupg2'
+            ;;
+        chimaera|4|4.0)
+            distname='chimaera'
+            distid='4'
+            mirror='http://mirror.vptech.eu/devuan/merged'
             include='gnupg2'
             ;;
         *)
@@ -381,7 +394,7 @@ fi
 # -l / --latest
 if [ -z "${latest}" ]
 then
-    latest='ascii'
+    latest='beowulf'
 fi
 
 # -v / --verbose

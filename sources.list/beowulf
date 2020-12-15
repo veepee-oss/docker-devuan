@@ -1,0 +1,4 @@
+deb http://mirror.vptech.eu/devuan beowulf main
+deb http://mirror.vptech.eu/devuan beowulf-updates main
+deb http://mirror.vptech.eu/devuan beowulf-backports main
+deb http://mirror.vptech.eu/devuan beowulf-security main

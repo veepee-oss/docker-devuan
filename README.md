@@ -1,16 +1,13 @@
 # docker-devuan
 
-[![License][license-img]][license-href]
-[![docker][docker-img]][docker-href]
-
 1. [Overview](#overview)
-2. [Description](#description)
-3. [Tags](#tags)
-4. [Setup](#setup)
-5. [Usage](#usage)
-6. [Limitations](#limitations)
-7. [Development](#development)
-8. [Miscellaneous](#miscellaneous)
+1. [Description](#description)
+1. [Tags](#tags)
+1. [Setup](#setup)
+1. [Usage](#usage)
+1. [Limitations](#limitations)
+1. [Development](#development)
+1. [Miscellaneous](#miscellaneous)
 
 ## Overview
 
@@ -18,7 +15,7 @@ Devuan is  a free software  operating system  for your computer.  Free software
 means you are free to use, copy and distribute, study, change the software, and
 share your modifications with the community.
 
-[devuan.org][overview-href]
+[devuan.org](https://www.devuan.org/)
 
 ## Description
 
@@ -94,7 +91,7 @@ Only work on Debian, Devuan and Ubuntu.
 
 ## Development
 
-Please read carefully [CONTRIBUTING.md][contribute-href]  before making a merge
+Please read carefully [CONTRIBUTING.md](CONTRIBUTING.md) before making a merge
 request.
 
 ## Miscellaneous
@@ -108,10 +105,3 @@ request.
   ╚═(███)═╝
    ╚═(███)═╝
 ```
-
-[license-img]: https://img.shields.io/badge/license-ISC-blue.svg
-[license-href]: LICENSE
-[docker-img]: https://img.shields.io/docker/pulls/vptech/devuan.svg
-[docker-href]: https://hub.docker.com/r/vptech/devuan
-[overview-href]: https://www.devuan.org/
-[contribute-href]: CONTRIBUTING.md
