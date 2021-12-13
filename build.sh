@@ -7,10 +7,10 @@ set -e
 PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 arch='amd64'
-oldstable='ascii'
-stable='beowulf'
-testing='chimaera'
-version='2.2'
+oldstable='beowulf'
+stable='chimaera'
+testing='daedalus'
+version='3.0'
 
 function usage()
 {
@@ -26,7 +26,7 @@ OPTIONS:
    -h, --help           Show help
 
    -d, --dist           Choose Devuan distribution
-                        eg: jessie, ascii, beowulf
+                        eg: jessie, ascii, beowulf, chimaera
 
    -t, --timezone       Choose your preferred timezone
                         default: Europe/Amsterdam
@@ -38,7 +38,7 @@ OPTIONS:
                         default: no
 
    -l, --latest         Force the "latest"
-                        default: beowulf
+                        default: chimaera
 
    -v, --verbose        Verbose mode
 
@@ -369,6 +369,12 @@ then
             mirror='http://mirror.vptech.eu/devuan/merged'
             include='gnupg2'
             ;;
+        daedalus|5|5.0)
+            distname='daedalus'
+            distid='5'
+            mirror='http://mirror.vptech.eu/devuan/merged'
+            include='gnupg2'
+            ;;
         *)
             usage
             exit 1
@@ -394,7 +400,7 @@ fi
 # -l / --latest
 if [ -z "${latest}" ]
 then
-    latest='beowulf'
+    latest='chimaera'
 fi
 
 # -v / --verbose
