@@ -1,0 +1,4 @@
+deb http://mirror.vptech.eu/devuan chimaera main
+deb http://mirror.vptech.eu/devuan chimaera-updates main
+deb http://mirror.vptech.eu/devuan chimaera-backports main
+deb http://mirror.vptech.eu/devuan chimaera-security main

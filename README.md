@@ -1,4 +1,4 @@
-# docker-devuan
+# devuan
 
 1. [Overview](#overview)
 1. [Description](#description)
@@ -25,8 +25,10 @@ Use this script to build your own base system.
 
 Supported tags.
 
-- 1, jessie, oldstable
-- 2, ascii, stable, latest
+- 1, jessie
+- 2, ascii
+- 3, beowulf, oldstable
+- 4, chimaera, stable, latest
 
 ## Setup
 
@@ -73,16 +75,16 @@ Show help.
 ./build.sh -h
 ```
 
-Build your own Debian image (eg. jessie).
+Build your own Debian image (eg. beowulf).
 
 ```bash
-./build.sh -d jessie -u vptech
+./build.sh -d beowulf -u vptech
 ```
 
-Build your own Devuan image (eg. ascii) and push it on the Docker Hub.
+Build your own Devuan image (eg. chimaera) and push it on the Docker Hub.
 
 ```bash
-./build.sh -d ascii -u vptech -p
+./build.sh -d chimaera -u vptech -p
 ```
 
 ## Limitations

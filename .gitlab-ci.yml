@@ -16,6 +16,7 @@ include:
     - apt-get install -qq -y apt-transport-https ca-certificates curl debootstrap kmod gnupg-agent procps software-properties-common sudo systemd tar
     - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/ascii
     - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/beowulf
+    - ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/chimaera
     - curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
     - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
     - apt-get update  -qq -y
@@ -38,8 +39,10 @@ include:
     - docker load -i image/devuan-v1.0.tar
     - docker load -i image/devuan-v2.0.tar
     - docker load -i image/devuan-v3.0.tar
+    - docker load -i image/devuan-v4.0.tar
   only:
     - master
+    - main
   services:
     - name: docker.registry.vptech.eu/docker:dind
       alias: docker
@@ -55,39 +58,48 @@ stages:
   - release
 
 # build
-v1.0:
+build:jessie:
   <<: *build
   script:
     - ./build.sh -d jessie -v
     - mkdir image
     - docker save devuan:jessie > image/devuan-v1.0.tar
 
-v2.0:
+build:ascii:
   <<: *build
   script:
     - ./build.sh -d ascii -v
     - mkdir image
     - docker save devuan:ascii > image/devuan-v2.0.tar
 
-v3.0:
+build:beowulf:
   <<: *build
   script:
     - ./build.sh -d beowulf -v
     - mkdir image
     - docker save devuan:beowulf > image/devuan-v3.0.tar
 
+build:chimaera:
+  <<: *build
+  script:
+    - ./build.sh -d chimaera -v
+    - mkdir image
+    - docker save devuan:chimaera > image/devuan-v4.0.tar
+
 # deploy
 vptech:
   <<: *deploy
   script:
-    - docker tag devuan:jessie  vptech/devuan:jessie
-    - docker tag devuan:jessie  vptech/devuan:1
-    - docker tag devuan:ascii   vptech/devuan:ascii
-    - docker tag devuan:ascii   vptech/devuan:2
-    - docker tag devuan:ascii   vptech/devuan:oldstable
-    - docker tag devuan:beowulf vptech/devuan:beowulf
-    - docker tag devuan:beowulf vptech/devuan:3
-    - docker tag devuan:beowulf vptech/devuan:stable
-    - docker tag devuan:beowulf vptech/devuan:latest
+    - docker tag devuan:jessie   vptech/devuan:jessie
+    - docker tag devuan:jessie   vptech/devuan:1
+    - docker tag devuan:ascii    vptech/devuan:ascii
+    - docker tag devuan:ascii    vptech/devuan:2
+    - docker tag devuan:beowulf  vptech/devuan:beowulf
+    - docker tag devuan:beowulf  vptech/devuan:3
+    - docker tag devuan:beowulf  vptech/devuan:oldstable
+    - docker tag devuan:chimaera vptech/devuan:chimaera
+    - docker tag devuan:chimaera vptech/devuan:4
+    - docker tag devuan:chimaera vptech/devuan:stable
+    - docker tag devuan:chimaera vptech/devuan:latest
     - docker push --all-tags vptech/devuan
 # EOF
