@@ -8,6 +8,9 @@ include:
     ref: 3.10.0
     file: gitlab-ci.yml
 
+variables:
+  SEMANTIC_CONFIG_FILE: changelog
+
 .template: &build
   stage: build
   image: docker.registry.vptech.eu/vptech/debian:buster
