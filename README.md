@@ -1,14 +1,5 @@
 # devuan
 
-1. [Overview](#overview)
-1. [Description](#description)
-1. [Tags](#tags)
-1. [Setup](#setup)
-1. [Usage](#usage)
-1. [Limitations](#limitations)
-1. [Development](#development)
-1. [Miscellaneous](#miscellaneous)
-
 ## Overview
 
 Devuan is  a free software  operating system  for your computer.  Free software
@@ -93,12 +84,11 @@ Only work on Debian, Devuan and Ubuntu.
 
 ## Development
 
-Please read carefully [CONTRIBUTING.md](CONTRIBUTING.md) before making a merge
-request.
+Please read carefully [CONTRIBUTING.md](CONTRIBUTING.md) before making a merge request.
 
 ## Miscellaneous
 
-```
+```text
     ╚⊙ ⊙╝
   ╚═(███)═╝
  ╚═(███)═╝
